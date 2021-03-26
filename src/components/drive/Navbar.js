@@ -2,22 +2,11 @@ import React from "react";
 import { useHistory, Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  makeStyles,
-} from "@material-ui/core";
+import firelogo from "../../images/fire2.png";
 
-const useStyles = makeStyles((theme) => ({
-  title: {
-    flexGrow: 1,
-  },
-}));
+import { Navbar, Nav, Button } from "react-bootstrap";
 
-const Navbar = (props) => {
-  const classes = useStyles();
+const NavbarComponent = (props) => {
   const { logout, currentUser } = useAuth();
   const history = useHistory();
   const handleLogout = async () => {
@@ -30,19 +19,29 @@ const Navbar = (props) => {
   };
   return (
     <div>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h3" className={classes.title}>
-            <Link to="/">Lima</Link>
-          </Typography>
-          <Typography variant="h6">
+      <Navbar expand="sm" bg="dark" variant="dark" className="pl-5 pr-5">
+        <Navbar.Brand as={Link} to="/" className="mr-auto">
+          <img
+            alt="fire"
+            src={firelogo}
+            width="30"
+            height="30"
+            className="d-inline-block align-top"
+          />{" "}
+          Dashboard
+        </Navbar.Brand>
+        <Nav>
+          <Navbar.Text className="mr-5 active">
+            Signed in as :{" "}
             {currentUser.email.substr(0, currentUser.email.indexOf("@"))}
-          </Typography>
-          <Button onClick={handleLogout}>Login</Button>
-        </Toolbar>
-      </AppBar>
+          </Navbar.Text>
+          <Button variant="danger" onClick={handleLogout}>
+            Logout
+          </Button>
+        </Nav>
+      </Navbar>
     </div>
   );
 };
 
-export default Navbar;
+export default NavbarComponent;
