@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { database } from "../../firebase";
 
 import { useAuth } from "../../contexts/AuthContext";
+import { ROOT_FOLDER } from "../../hooks/useFolder";
 
 import { Button, Modal, Form } from "react-bootstrap";
 
@@ -23,10 +24,15 @@ const MakeFolder = ({ currentFolder }) => {
     if (currentFolder === null) {
       return;
     }
+    const path = [...currentFolder.path];
+    if (currentFolder !== ROOT_FOLDER) {
+      path.push({ name: currentFolder.name, id: currentFolder.id });
+    }
     database.folders.add({
       name: folderName,
       parentId: currentFolder.id,
       createdAt: database.getCurrentTimestamp(),
+      path: path,
       userId: currentUser.uid,
     });
     setFolderName("");
@@ -35,8 +41,8 @@ const MakeFolder = ({ currentFolder }) => {
 
   return (
     <div>
-      <Button variant="outline-success" size="sm" onClick={openModal}>
-        <i class="fa fa-folder-plus"></i> New Folder
+      <Button variant="outline-success" size="md" onClick={openModal}>
+        <i className="fa fa-folder-plus"></i> New Folder
       </Button>
       <Modal show={open} onHide={closeModal} centered>
         <Form onSubmit={handleSubmit}>

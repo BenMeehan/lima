@@ -15,6 +15,7 @@ const App = () => {
       <AuthProvider>
         <Switch>
           <PrivateRoute path="/" exact={true} component={Dashboard} />
+          <PrivateRoute path="/folder/:folderId" component={Dashboard} />
           <Route path="/signup" component={Signup} />
           <Route path="/login" component={Login} />
           <Route path="/forgotPassword" component={ForgotPassword} />
