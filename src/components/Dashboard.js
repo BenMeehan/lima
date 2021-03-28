@@ -7,7 +7,8 @@ import MakeFile from "./drive/MakeFile";
 import FolderBreadCrumbs from "../components/drive/FolderBreadCrumbs";
 import { useState } from "react";
 
-import Delete from "./drive/Delete";
+import DeleteFolder from "./drive/DeleteFolder";
+import DeleteFile from "./drive/DeleteFile";
 
 import { useAuth } from "../contexts/AuthContext";
 
@@ -27,14 +28,21 @@ const Dashboard = () => {
     state.folder
   );
   const { currentUser } = useAuth();
-  const [open, setOpen] = useState(false);
+  const [fileOpen, setFileOpen] = useState(false);
+  const [folderOpen, setFolderOpen] = useState(false);
   const [show, setShow] = useState(false);
   const [deletionMessage, setDeletionMessage] = useState("");
-  const openModal = () => {
-    setOpen(true);
+  const openFileModal = () => {
+    setFileOpen(true);
   };
-  const closeModal = () => {
-    setOpen(false);
+  const closeFileModal = () => {
+    setFileOpen(false);
+  };
+  const openFolderModal = () => {
+    setFolderOpen(true);
+  };
+  const closeFolderModal = () => {
+    setFolderOpen(false);
   };
   const handleFileDelete = (fileToBeDeleted) => {
     database.files
@@ -48,7 +56,7 @@ const Dashboard = () => {
         setDeletionMessage("Oh Snap! Error in deleting file");
         setShow(true);
       });
-    closeModal();
+    closeFileModal();
   };
   const handleDelete = (folderToBeDeleted) => {
     database.folders
@@ -61,7 +69,16 @@ const Dashboard = () => {
           doc.ref.delete();
         });
       });
-    console.log(folderToBeDeleted.id);
+    database.files
+      .where("folderId", "==", folderToBeDeleted.id)
+      .where("userId", "==", currentUser.uid)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach(function (doc) {
+          doc.ref.delete();
+        });
+      });
+    // console.log(folderToBeDeleted.id);
     database.folders
       .doc(folderToBeDeleted.id)
       .delete()
@@ -73,7 +90,7 @@ const Dashboard = () => {
         setDeletionMessage("Oh Snap! Error in deleting folder");
         setShow(true);
       });
-    closeModal();
+    closeFolderModal();
   };
   return (
     <div>
@@ -99,7 +116,7 @@ const Dashboard = () => {
                     <Button
                       size="sm"
                       variant="outline-danger"
-                      onClick={() => openModal()}
+                      onClick={() => openFolderModal()}
                       data-toggle="tooltip"
                       title="Delete"
                     >
@@ -107,9 +124,9 @@ const Dashboard = () => {
                     </Button>
                   </p>
                   <Folder folder={childFolder} />
-                  <Delete
-                    open={open}
-                    closeModal={closeModal}
+                  <DeleteFolder
+                    open={folderOpen}
+                    closeModal={closeFolderModal}
                     item={childFolder}
                     handleDelete={handleDelete}
                   />
@@ -132,7 +149,7 @@ const Dashboard = () => {
                     <Button
                       size="sm"
                       variant="outline-danger"
-                      onClick={() => openModal()}
+                      onClick={() => openFileModal()}
                       data-toggle="tooltip"
                       title="Delete"
                     >
@@ -140,11 +157,11 @@ const Dashboard = () => {
                     </Button>
                   </p>
                   <File file={childFile} />
-                  <Delete
-                    open={open}
-                    closeModal={closeModal}
+                  <DeleteFile
+                    open={fileOpen}
+                    closeModal={closeFileModal}
                     item={childFile}
-                    handleDelete={handleFileDelete}
+                    handleFileDelete={handleFileDelete}
                   />
                 </div>
               );
