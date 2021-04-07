@@ -1,0 +1,19 @@
+.top-line {
+  border-width: 3px;
+  border-style: solid;
+  border-image: linear-gradient(to right, red, rgba(0, 0, 0, 0)) 100 1%;
+  border-bottom: 0;
+}
+.middle-line {
+  border-width: 3px;
+  border-style: solid;
+  border-image: linear-gradient(to bottom, rgb(0, 102, 255), rgba(0, 0, 0, 0)) 1
+    100%;
+  border-right: 0;
+}
+.crumb-line {
+  border-width: 3px;
+  border-style: solid;
+  border-image: linear-gradient(to right, teal, rgba(0, 0, 0, 0)) 100 1%;
+  border-bottom: 0;
+}

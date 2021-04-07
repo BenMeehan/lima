@@ -17,7 +17,9 @@ const Delete = (props) => {
         </Button>
         <Button
           variant="primary"
-          onClick={() => props.handleFileDelete(props.item)}
+          onClick={() =>
+            props.handleFileDelete(props.item, props.currentFolder)
+          }
         >
           Confrim
         </Button>

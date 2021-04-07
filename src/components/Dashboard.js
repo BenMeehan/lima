@@ -6,6 +6,7 @@ import MakeFolder from "./drive/MakeFolder";
 import MakeFile from "./drive/MakeFile";
 import FolderBreadCrumbs from "../components/drive/FolderBreadCrumbs";
 import { useState } from "react";
+import { ROOT_FOLDER } from "../hooks/useFolder";
 
 import DeleteFolder from "./drive/DeleteFolder";
 import DeleteFile from "./drive/DeleteFile";
@@ -14,11 +15,12 @@ import { useAuth } from "../contexts/AuthContext";
 
 import { useParams, useLocation } from "react-router-dom";
 
-import { Container, Button, Toast } from "react-bootstrap";
+import { Container, Button, Toast, Row, Col } from "react-bootstrap";
 
 import { useFolder } from "../hooks/useFolder";
 
-import { database } from "../firebase.js";
+import { database, storage } from "../firebase.js";
+import "../styles/styles.css";
 
 const Dashboard = () => {
   const { folderId } = useParams();
@@ -44,7 +46,24 @@ const Dashboard = () => {
   const closeFolderModal = () => {
     setFolderOpen(false);
   };
-  const handleFileDelete = (fileToBeDeleted) => {
+  const handleFileDelete = (fileToBeDeleted, currentFolder) => {
+    let filePath = "";
+    if (currentFolder === null || fileToBeDeleted === null) {
+      return;
+    } else {
+      filePath =
+        currentFolder === ROOT_FOLDER
+          ? `${currentFolder.path.join("/")}/${fileToBeDeleted.name}`
+          : `${currentFolder.path.join("/")}/${currentFolder.name}/${
+              fileToBeDeleted.name
+            }`;
+    }
+    // console.log(filePath);
+    storage
+      .ref(`/files/${currentUser.uid}/${filePath}`)
+      .delete()
+      .then()
+      .catch((e) => console.log(e));
     database.files
       .doc(fileToBeDeleted.id)
       .delete()
@@ -96,78 +115,99 @@ const Dashboard = () => {
     <div>
       <Navbar />
       <Container fluid>
-        <div className="d-flex p-2 mt-3 justify-content-around">
-          <MakeFolder currentFolder={folder} />
-          <MakeFile currentFolder={folder} />
-        </div>
-        <div className="d-flex pl-4">
+        <Row className="mt-3 mx-2">
+          <Col lg={true}>
+            <MakeFolder currentFolder={folder} />
+          </Col>
+          <Col lg={true} className="align-items-right">
+            <MakeFile currentFolder={folder} />
+          </Col>
+        </Row>
+        <div className="d-flex pl-4 crumb-line mt-4">
           <FolderBreadCrumbs currentFolder={folder} />
         </div>
-        {childFolders.length > 0 && (
-          <div className="d-flex flex-wrap">
-            {childFolders.map((childFolder) => {
-              return (
-                <div
-                  key={childFolder.id}
-                  style={{ maxWidth: "80px", textAlign: "center" }}
-                  className="p-2 m-2"
-                >
-                  <p style={{ margin: 0 }}>
-                    <Button
-                      size="sm"
-                      variant="outline-danger"
-                      onClick={() => openFolderModal()}
-                      data-toggle="tooltip"
-                      title="Delete"
-                    >
-                      ❌
-                    </Button>
-                  </p>
-                  <Folder folder={childFolder} />
-                  <DeleteFolder
-                    open={folderOpen}
-                    closeModal={closeFolderModal}
-                    item={childFolder}
-                    handleDelete={handleDelete}
-                  />
+        <Row>
+          {childFolders.length > 0 && (
+            <Col lg={true}>
+              <div>
+                <h5 className="pl-2 pt-2 top-line">Folders</h5>
+                <div className="d-flex flex-wrap">
+                  {childFolders.map((childFolder) => {
+                    return (
+                      <div
+                        key={childFolder.id}
+                        style={{ maxWidth: "80px", textAlign: "center" }}
+                        className="p-2 m-2"
+                      >
+                        <p style={{ margin: 0 }} className="p-1">
+                          <Button
+                            size="sm"
+                            variant="outline-danger"
+                            onClick={() => openFolderModal()}
+                            data-toggle="tooltip"
+                            title="Delete"
+                            // style={{ borderRadius: "50%" }}
+                          >
+                            <i class="fas fa-trash"></i>
+                          </Button>
+                        </p>
+                        <Folder folder={childFolder} />
+                        <DeleteFolder
+                          open={folderOpen}
+                          closeModal={closeFolderModal}
+                          item={childFolder}
+                          handleDelete={handleDelete}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        )}
-        {childFolders.length > 0 && childFiles.length > 0 ? <hr /> : null}
-        {childFiles.length > 0 && (
-          <div className="d-flex flex-wrap">
-            {childFiles.map((childFile) => {
-              return (
-                <div
-                  key={childFile.id}
-                  style={{ maxWidth: "80px", textAlign: "center" }}
-                  className="p-2 m-2"
-                >
-                  <p style={{ margin: 0 }}>
-                    <Button
-                      size="sm"
-                      variant="outline-danger"
-                      onClick={() => openFileModal()}
-                      data-toggle="tooltip"
-                      title="Delete"
-                    >
-                      ❌
-                    </Button>
-                  </p>
-                  <File file={childFile} />
-                  <DeleteFile
-                    open={fileOpen}
-                    closeModal={closeFileModal}
-                    item={childFile}
-                    handleFileDelete={handleFileDelete}
-                  />
+              </div>
+            </Col>
+          )}
+          {childFolders.length > 0 || childFiles.length > 0 ? (
+            <div className="middle-line"></div>
+          ) : null}
+          <Col lg={true}>
+            {childFiles.length > 0 && (
+              <div>
+                <h5 className="pl-2 pt-2 top-line">Files</h5>
+                <div className="d-flex flex-wrap">
+                  {childFiles.map((childFile) => {
+                    return (
+                      <div
+                        key={childFile.id}
+                        style={{ maxWidth: "100px", textAlign: "center" }}
+                        className="p-2 m-2"
+                      >
+                        <p style={{ margin: 0 }}>
+                          <Button
+                            size="sm"
+                            variant="outline-danger"
+                            onClick={() => openFileModal()}
+                            data-toggle="tooltip"
+                            title="Delete"
+                            // style={{ borderRadius: "50%" }}
+                          >
+                            <i class="fas fa-trash"></i>
+                          </Button>
+                        </p>
+                        <File file={childFile} />
+                        <DeleteFile
+                          open={fileOpen}
+                          closeModal={closeFileModal}
+                          item={childFile}
+                          currentFolder={folder}
+                          handleFileDelete={handleFileDelete}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        )}
+              </div>
+            )}
+          </Col>
+        </Row>
         <Toast
           onClose={() => setShow(false)}
           show={show}
