@@ -14,6 +14,5 @@
 .crumb-line {
   border-width: 3px;
   border-style: solid;
-  border-image: linear-gradient(to right, teal, rgba(0, 0, 0, 0)) 100 1%;
-  border-bottom: 0;
+  border-image: linear-gradient(to right, red, rgba(0, 0, 0, 0)) 100 1%;
 }

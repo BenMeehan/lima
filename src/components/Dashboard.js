@@ -130,7 +130,7 @@ const Dashboard = () => {
           {childFolders.length > 0 && (
             <Col lg={true}>
               <div>
-                <h5 className="pl-2 pt-2 top-line">Folders</h5>
+                <h5 className="pl-2 pt-2">Folders</h5>
                 <div className="d-flex flex-wrap">
                   {childFolders.map((childFolder) => {
                     return (
@@ -165,13 +165,13 @@ const Dashboard = () => {
               </div>
             </Col>
           )}
-          {childFolders.length > 0 || childFiles.length > 0 ? (
+          {childFolders.length > 0 && childFiles.length > 0 ? (
             <div className="middle-line"></div>
           ) : null}
           <Col lg={true}>
             {childFiles.length > 0 && (
               <div>
-                <h5 className="pl-2 pt-2 top-line">Files</h5>
+                <h5 className="pl-2 pt-2">Files</h5>
                 <div className="d-flex flex-wrap">
                   {childFiles.map((childFile) => {
                     return (
